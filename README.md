@@ -1,0 +1,2 @@
+# CopsAndRobbers
+Combinatorics research game
