@@ -101,13 +101,15 @@ def placeOnMatrix(game,place,name):
 def vertMove(game,place,name,choices):
     vert = random.choice(choices)
     place[0] += vert
+    place[0] %= game.m # prevents index errors
     print('Up/Down:',vert,'to',place[0])
     return game
 
 def horizMove(game,place,name,choices):
     horiz = random.choice(choices)
-    game.matrix[place[0]][place[1]+horiz] = name
-    place[1] += horiz
+    place[1] += horiz 
+    place[1] %= game.n # prevents index errors  
+    game.matrix[place[0]][place[1]] = name
     print('Side/Side:',horiz,'to',place[1],'\n')
     return game
 
