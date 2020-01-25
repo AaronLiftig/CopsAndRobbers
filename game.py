@@ -1,6 +1,11 @@
 import numpy as np
 import random
 
+# Currently, the robber moves first,
+# meaning that the robber can lose by moving onto the cop.
+# This avoids the players not acknowledging when they cross paths,
+# Though there are other ways to avoid this that are less 'turn-based.'
+
 class createGame:
 	def __init__(self):
 		self.robName,self.copName = 1,2
@@ -8,8 +13,8 @@ class createGame:
 def createMatrix(game):
 	return np.zeros((game.m,game.n))
 
-def placeRob(game,place='random'):
-	# place is a location on an mxn matrix
+def placeRob(game,place):
+	# place is a location on an 0-indexed, mxn matrix
 	# otherwise, enter an (m,n) tuple
 	if place == 'random':
 		m_pr = random.randint(0,game.m-1)
@@ -28,8 +33,8 @@ def robChar(game,howDrunk,escape,twoMoveProb):
 	game.robTwoMove = twoMoveProb # Moves two squares this percent of the time
 	return game
 
-def placeCop(game,place='random'): 
-	# place is a location on an mxn matrix that is not occupied by the robber
+def placeCop(game,place): 
+	# place is a location on a 0-indexed, mxn matrix that is not occupied by the robber
 	# otherwise, enter an (m,n) tuple
 	if place == 'random':
 		m_pc = random.randint(0,game.m-1)
@@ -68,6 +73,7 @@ def move(game,playerString): #Finds possible move for player
 	place,name,drunk = sidePick(game,playerString)
 	go = random.choices([False,True],[drunk,1-drunk])
 	print('Go:',go[0])
+	print('place:',place)
 	if go[0] == True:
 		game.matrix[place[0]][place[1]] = 0
 		oldVert = place[0]
@@ -76,6 +82,8 @@ def move(game,playerString): #Finds possible move for player
 			game = horizMove(game,place,name,[-1,1])
 		else:
 			game = horizMove(game,place,name,[-1,0,1])
+	else:
+		print('\n')
 	return game
 
 def checkIfCaught(game):
@@ -92,22 +100,15 @@ def placeOnMatrix(game,place,name):
 
 def vertMove(game,place,name,choices):
 	vert = random.choice(choices)
-	try:
-		game.matrix[place[0]+vert][place[1]] = name
-		place[0] += vert
-		print('Up/Down:',vert,'to',place[0])
-	except:
-		game = vertMove(game,place,name,choices)
+	place[0] += vert
+	print('Up/Down:',vert,'to',place[0])
 	return game
 
 def horizMove(game,place,name,choices):
 	horiz = random.choice(choices)
-	try:
-		game.matrix[place[0]][place[1]+horiz] = name
-		place[1] += horiz
-		print('Side/Side:',horiz,'to',place[1],'\n')
-	except:
-		game = horizMove(game,place,name,choices)
+	game.matrix[place[0]][place[1]+horiz] = name
+	place[1] += horiz
+	print('Side/Side:',horiz,'to',place[1],'\n')
 	return game
 
 def sidePick(game,playerString):
@@ -121,7 +122,7 @@ def sidePick(game,playerString):
 		drunk = game.copDrunk
 	return place,name,drunk
 
-def playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,rob2MoveProb=0):
+def playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,rob2MoveProb=0,robPlace='random',copPlace='random'):
 	game = createGame()
 	
 	game.m = int(input('Enter number of rows:'))
@@ -129,20 +130,20 @@ def playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,rob2MoveProb=
 	iterCount = 0
 	game.matrix = createMatrix(game)
 
-	game.robPlace = placeRob(game)
+	game.robPlace = placeRob(game,robPlace)
 	game = robChar(game,robDrunk,robEscape,rob2MoveProb)
-	game.copPlace = placeCop(game)
+	game.copPlace = placeCop(game,copPlace)
 	game = copChar(game,copDrunk,copChase)
 
 	printMatrix(game,iterCount)
-	print('Locations:',game.robPlace,game.copPlace,'\n')
+	print('Locations:\n','robber:',game.robPlace,'cop:',game.copPlace,'\n'*2)
 
 	while True:
 		caught,game = startChase(game)
 		iterCount += 1
 
 		printMatrix(game,iterCount)
-		print('Locations:',game.robPlace,game.copPlace,'\n')
+		print('Locations:\n','robber:',game.robPlace,'cop:',game.copPlace,'\n'*3)
 		
 		if caught == True:
 			break
@@ -151,5 +152,6 @@ def playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,rob2MoveProb=
 	print('It took '+ str(iterCount) +' iterations.')
 
 
-playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,rob2MoveProb=0)
+playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,rob2MoveProb=0,robPlace='random',copPlace='random')
+# placeRob and placeCop are tuples representing placement on a 0-indexed, mxn matrix
 # TODO Still need to implement chase/escape, 2-jump move by robber, and fix matrix bugs
