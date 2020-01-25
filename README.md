@@ -8,3 +8,5 @@
 #### A probability representing how 'drunk' the robber and cop are, meaning how often they forget to move.
 #### Whether the cop is chasing the robber or randomly moving, and whether the robber is escaping the cop or randomly moving.
 #### Whether the robber can make a 2-square move.
+
+### Currently moves in a turn-based fashion, with the robber moving first. That might be modified in the future.
