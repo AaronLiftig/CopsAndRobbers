@@ -38,7 +38,7 @@ def placeCop(game,place='random'):
 			game.matrix[m_pc][n_pc] = game.copName
 			return [m_pc,n_pc]	
 		else:
-			placeCop(game,place=place)		
+			[m_pc,n_pc] = placeCop(game,place=place)		
 	elif place.__class__ == tuple:
 		m_pc = place[0]
 		n_pc = place[1]
@@ -50,71 +50,76 @@ def copChar(game,howDrunk=.5,chase=True):
 	game.copChase = chase # If true, it tries to catch robber
 	return game
 
-def printMatrix(matrix,iterCount):
+def printMatrix(game,iterCount):
 	print('\n','Iteration:',iterCount)
-	print(matrix,'\n')
+	print(game.matrix,'\n')
 
 def startChase(game):
-	caught,game = robMove(game)
+	game = move(game,'rob')
+	caught,game = checkIfCaught(game)
 	if caught == True:
 		return caught,game
-	caught,game = copMove(game)
+	game = move(game,'cop')
+	caught,game = checkIfCaught(game)
 	return caught,game
 
-def move(game,place,drunk): #Finds possible move for player
+def move(game,playerString): #Finds possible move for player
+	place,name,drunk = sidePick(game,playerString)
 	go = random.choices([False,True],[drunk,1-drunk])
 	print('go:',go)
-	if go == True:
+	if go[0] == True:
 		game.matrix[place[0]][place[1]] = 0
-		oldRobVert = place[0]
-		game = vertMove(game,place,[-1,0,1])
-		if oldRobVert == place[0]: # Must move horizontally if not vertically
-			game = horizMove(game,place,[-1,1])
+		oldVert = place[0]
+		game = vertMove(game,place,name,[-1,0,1])
+		if oldVert == place[0]: # Must move horizontally if not vertically
+			game = horizMove(game,place,name,[-1,1])
 		else:
-			game = horizMove(game,place,[-1,0,1])
+			game = horizMove(game,place,name,[-1,0,1])
+		print('Move:',vertMove,horizMove)
 	return game
 
-def robMove(game):
-	game = move(game,game.robPlace,game.robDrunk)
-	if game.robPlace == game.copPlace:
-		game.matrix[game.robPlace[0]][game.robPlace[1]] = 3
-		print('The robber crossed paths with the cop and was caught.')
-		return True,game
-	else:
-		game = placeOnMatrix(game,game.robPlace,game.robName)
-		return False,game
-
-def copMove(game):
-	game = move(game,game.copPlace,game.copDrunk)
+def checkIfCaught(game):
 	if game.robPlace == game.copPlace:
 		game.matrix[game.robPlace[0]][game.robPlace[1]] = 3
 		return True,game
-	else:
+	elif game.robPlace != game.copPlace:
 		game = placeOnMatrix(game,game.copPlace,game.copName)
 		return False,game
-	pass
 
 def placeOnMatrix(game,place,name):
 	game.matrix[place[0]][place[1]] = name
 	return game
 
-def vertMove(game,place,choices):
+def vertMove(game,place,name,choices):
 	vert = random.choice(choices)
 	try:
-		game.matrix[game.player[0]+vert][game.player[1]]
+		game.matrix[place[0]+vert][place[1]] = name
 		place[0] += vert
 	except:
-		game = vertMove(game,place,choices)
+		pass		
+	game = vertMove(game,place,name,choices)
 	return game
 
-def horizMove(game,place,choices):
+def horizMove(game,place,name,choices):
 	horiz = random.choice(choices)
 	try:
-		game.matrix[game.player[0]][game.player[1]+horiz]
-		game.place[1] += horiz
+		game.matrix[place[0]][place[1]+horiz] = name
+		place[1] += horiz
 	except:
-		game = horizMove(game,place,choices)
+		pass
+	game = horizMove(game,place,choices)
 	return game
+
+def sidePick(game,playerString):
+	if playerString.lower() == 'rob':
+		place = game.robPlace
+		name = game.robName
+		drunk = game.robDrunk
+	elif playerString.lower() == 'cop':
+		place = game.copPlace
+		name = game.copName
+		drunk = game.copDrunk
+	return place,name,drunk
 
 def playGame():
 	game = createGame()
@@ -129,14 +134,16 @@ def playGame():
 	game.copPlace = placeCop(game)
 	game = copChar(game)
 
-	printMatrix(game.matrix,iterCount)
+	printMatrix(game,iterCount)
+	print(game.robPlace,game.copPlace)
 
 	while True:
 		caught,game = startChase(game)
 		iterCount += 1
 
-		printMatrix(game.matrix,iterCount)
-
+		printMatrix(game,iterCount)
+		print(game.robPlace,game.copPlace)
+		exit()
 		if caught == True:
 			break
 
