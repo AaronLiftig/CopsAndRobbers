@@ -1,7 +1,7 @@
 # CopsAndRobbers
 ## Combinatorics research game
 
-### A game of 'drunken' cops and robbers, where the cop and robber move randomly on an 0-indexed, mxn matrix. 
+### A game of 'drunken' cops and robbers, where the cop and robber move like chess kings randomly on an 0-indexed, mxn matrix. 
 
 ### The goal is to see the probability of the cop capturing the robber under various conditions, including:
 #### Various sizes of a matrix, which the cop and robber traverse.
