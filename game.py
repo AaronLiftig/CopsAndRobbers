@@ -1,73 +1,147 @@
 import numpy as np
 import random
 
-def createMatrix(m,n):
-	return np.zeros((m,n))
+class createGame:
+	def __init__(self):
+		self.robName,self.copName = 1,2
 
-def placeRob(m,n,matrix,place='random'):
+def createMatrix(game):
+	return np.zeros((game.m,game.n))
+
+def placeRob(game,place='random'):
 	# place is a location on an mxn matrix
 	# otherwise, enter an (m,n) tuple
 	if place == 'random':
-		m_pr = random.randint(0,m-1)
-		n_pr = random.randint(0,n-1)
-		matrix[m_pr][n_pr] = 1
-		return m_pr,n_pr	
+		m_pr = random.randint(0,game.m-1)
+		n_pr = random.randint(0,game.n-1)
+		game.matrix[m_pr][n_pr] = game.robName
+		return [m_pr,n_pr]	
 	elif place.__class__ == tuple:
 		m_pr = place[0]
 		n_pr = place[1]
-		matrix[m_pr][n_pr] = 1
-		return m_pr,n_pr
+		game.matrix[m_pr][n_pr] = game.robName
+		return [m_pr,n_pr]
+		
+def robChar(game,howDrunk=.5,escape=False,twoMoveProb=0):
+	game.robDrunk = howDrunk # Doesn't move this percent of the time
+	game.robEscape = escape # If true, it tries to avoid cop
+	game.robTwoMove = twoMoveProb # Moves two squares this percent of the time
+	return game
 
-def robChar(rob,howDrunk=.5,escape=False,twoMoveProb=0):
-	rob.drunk = howDrunk
-	rob.escape = escape
-	rob.twomove = twoMoveProb
-	return rob
-
-def placeCop(m_pr,n_pr,m,n,matrix,place='random'): 
+def placeCop(game,place='random'): 
 	# place is a location on an mxn matrix that is not occupied by the robber
 	# otherwise, enter an (m,n) tuple
 	if place == 'random':
-		m_pc = random.randint(0,m-1)
-		n_pc = random.randint(0,n-1)
-		if (m_pc != m_pr) | (n_pc != n_pr):
-			matrix[m_pc][n_pc] = 2
+		m_pc = random.randint(0,game.m-1)
+		n_pc = random.randint(0,game.n-1)
+		if (m_pc != game.robPlace[0]) | (n_pc != game.robPlace[1]):
+			game.matrix[m_pc][n_pc] = game.copName
+			return [m_pc,n_pc]	
 		else:
-			placeCop(m_pr,n_pr,m,n,matrix,place=place)
+			placeCop(game,place=place)		
 	elif place.__class__ == tuple:
 		m_pc = place[0]
 		n_pc = place[1]
-		matrix[m_pc][n_pc] = 2
+		game.matrix[m_pc][n_pc] = game.copName
+		return [m_pc,n_pc]
 
-def copChar(cop,howDrunk=.5,chase=True):
-	cop.drunk = howDrunk
-	cop.chase = chase
-	return cop
+def copChar(game,howDrunk=.5,chase=True):
+	game.copDrunk = howDrunk # Doesn't move this percent of the time
+	game.copChase = chase # If true, it tries to catch robber
+	return game
 
-def startChase():
-	robMove()
-	copMove()
-	pass
-
-def playGame():
-	m = int(input('Enter number of rows:'))
-	n = int(input('Enter number of columns:'))
-	iterCount = 0
-
-	matrix = createMatrix(m,n)
-	rob,cop = object,object
-	
-	m_pr,n_pr = placeRob(m,n,matrix)
-	rob = robChar(rob)
-	placeCop(m_pr,n_pr,m,n,matrix)
-	cop = copChar(cop)
-
+def printMatrix(matrix,iterCount):
 	print('\n','Iteration:',iterCount)
 	print(matrix,'\n')
 
-	while rob.locate != cop.locate:
-		startChase()
+def startChase(game):
+	caught,game = robMove(game)
+	if caught == True:
+		return caught,game
+	caught,game = copMove(game)
+	return caught,game
 
+def move(game,place,drunk): #Finds possible move for player
+	go = random.choices([False,True],[drunk,1-drunk])
+	print('go:',go)
+	if go == True:
+		game.matrix[place[0]][place[1]] = 0
+		oldRobVert = place[0]
+		game = vertMove(game,place,[-1,0,1])
+		if oldRobVert == place[0]: # Must move horizontally if not vertically
+			game = horizMove(game,place,[-1,1])
+		else:
+			game = horizMove(game,place,[-1,0,1])
+	return game
+
+def robMove(game):
+	game = move(game,game.robPlace,game.robDrunk)
+	if game.robPlace == game.copPlace:
+		game.matrix[game.robPlace[0]][game.robPlace[1]] = 3
+		print('The robber crossed paths with the cop and was caught.')
+		return True,game
+	else:
+		game = placeOnMatrix(game,game.robPlace,game.robName)
+		return False,game
+
+def copMove(game):
+	game = move(game,game.copPlace,game.copDrunk)
+	if game.robPlace == game.copPlace:
+		game.matrix[game.robPlace[0]][game.robPlace[1]] = 3
+		return True,game
+	else:
+		game = placeOnMatrix(game,game.copPlace,game.copName)
+		return False,game
+	pass
+
+def placeOnMatrix(game,place,name):
+	game.matrix[place[0]][place[1]] = name
+	return game
+
+def vertMove(game,place,choices):
+	vert = random.choice(choices)
+	try:
+		game.matrix[game.player[0]+vert][game.player[1]]
+		place[0] += vert
+	except:
+		game = vertMove(game,place,choices)
+	return game
+
+def horizMove(game,place,choices):
+	horiz = random.choice(choices)
+	try:
+		game.matrix[game.player[0]][game.player[1]+horiz]
+		game.place[1] += horiz
+	except:
+		game = horizMove(game,place,choices)
+	return game
+
+def playGame():
+	game = createGame()
+	
+	game.m = int(input('Enter number of rows:'))
+	game.n = int(input('Enter number of columns:'))
+	iterCount = 0
+	game.matrix = createMatrix(game)
+
+	game.robPlace = placeRob(game)
+	game = robChar(game)
+	game.copPlace = placeCop(game)
+	game = copChar(game)
+
+	printMatrix(game.matrix,iterCount)
+
+	while True:
+		caught,game = startChase(game)
+		iterCount += 1
+
+		printMatrix(game.matrix,iterCount)
+
+		if caught == True:
+			break
+
+	print('The cop caught the robber.')
+	print('It took '+iterCount+' iterations.')
 
 
 playGame()
