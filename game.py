@@ -22,7 +22,7 @@ def placeRob(game,place='random'):
 		game.matrix[m_pr][n_pr] = game.robName
 		return [m_pr,n_pr]
 		
-def robChar(game,howDrunk=.5,escape=False,twoMoveProb=0):
+def robChar(game,howDrunk,escape,twoMoveProb):
 	game.robDrunk = howDrunk # Doesn't move this percent of the time
 	game.robEscape = escape # If true, it tries to avoid cop
 	game.robTwoMove = twoMoveProb # Moves two squares this percent of the time
@@ -45,7 +45,7 @@ def placeCop(game,place='random'):
 		game.matrix[m_pc][n_pc] = game.copName
 		return [m_pc,n_pc]
 
-def copChar(game,howDrunk=.5,chase=True):
+def copChar(game,howDrunk,chase):
 	game.copDrunk = howDrunk # Doesn't move this percent of the time
 	game.copChase = chase # If true, it tries to catch robber
 	return game
@@ -64,9 +64,10 @@ def startChase(game):
 	return caught,game
 
 def move(game,playerString): #Finds possible move for player
+	print('Move:',playerString)
 	place,name,drunk = sidePick(game,playerString)
 	go = random.choices([False,True],[drunk,1-drunk])
-	print('go:',go)
+	print('Go:',go[0])
 	if go[0] == True:
 		game.matrix[place[0]][place[1]] = 0
 		oldVert = place[0]
@@ -75,7 +76,6 @@ def move(game,playerString): #Finds possible move for player
 			game = horizMove(game,place,name,[-1,1])
 		else:
 			game = horizMove(game,place,name,[-1,0,1])
-		print('Move:',vertMove,horizMove)
 	return game
 
 def checkIfCaught(game):
@@ -95,9 +95,9 @@ def vertMove(game,place,name,choices):
 	try:
 		game.matrix[place[0]+vert][place[1]] = name
 		place[0] += vert
+		print('Up/Down:',vert,'to',place[0])
 	except:
-		pass		
-	game = vertMove(game,place,name,choices)
+		game = vertMove(game,place,name,choices)
 	return game
 
 def horizMove(game,place,name,choices):
@@ -105,9 +105,9 @@ def horizMove(game,place,name,choices):
 	try:
 		game.matrix[place[0]][place[1]+horiz] = name
 		place[1] += horiz
+		print('Side/Side:',horiz,'to',place[1],'\n')
 	except:
-		pass
-	game = horizMove(game,place,choices)
+		game = horizMove(game,place,name,choices)
 	return game
 
 def sidePick(game,playerString):
@@ -121,7 +121,7 @@ def sidePick(game,playerString):
 		drunk = game.copDrunk
 	return place,name,drunk
 
-def playGame():
+def playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,rob2MoveProb=0):
 	game = createGame()
 	
 	game.m = int(input('Enter number of rows:'))
@@ -130,25 +130,26 @@ def playGame():
 	game.matrix = createMatrix(game)
 
 	game.robPlace = placeRob(game)
-	game = robChar(game)
+	game = robChar(game,robDrunk,robEscape,rob2MoveProb)
 	game.copPlace = placeCop(game)
-	game = copChar(game)
+	game = copChar(game,copDrunk,copChase)
 
 	printMatrix(game,iterCount)
-	print(game.robPlace,game.copPlace)
+	print('Locations:',game.robPlace,game.copPlace,'\n')
 
 	while True:
 		caught,game = startChase(game)
 		iterCount += 1
 
 		printMatrix(game,iterCount)
-		print(game.robPlace,game.copPlace)
-		exit()
+		print('Locations:',game.robPlace,game.copPlace,'\n')
+		
 		if caught == True:
 			break
 
 	print('The cop caught the robber.')
-	print('It took '+iterCount+' iterations.')
+	print('It took '+ str(iterCount) +' iterations.')
 
 
-playGame()
+playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,rob2MoveProb=0)
+# TODO Still need to implement chase/escape, 2-jump move by robber, and fix matrix bugs
