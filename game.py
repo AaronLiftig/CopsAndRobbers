@@ -26,7 +26,7 @@ def placeRob(game,place):
         n_pr = place[1]
         game.matrix[m_pr][n_pr] = game.robName
         return [m_pr,n_pr]
-        
+
 def robChar(game,howDrunk,escape,twoMoveProb):
     game.robDrunk = howDrunk # Doesn't move this percent of the time
     game.robEscape = escape # If true, it tries to avoid cop
@@ -56,7 +56,7 @@ def copChar(game,howDrunk,chase):
     return game
 
 def printMatrix(game,iterCount):
-    print('\n','Iteration:',iterCount)
+    print('Iteration:',iterCount)
     print(game.matrix,'\n')
 
 def startChase(game):
@@ -87,31 +87,61 @@ def move(game,playerString): #Finds possible move for player
     return game
 
 def checkIfCaught(game):
-    if game.robPlace == game.copPlace:
+    if game.robPlace != game.copPlace:
+        game.matrix[game.copPlace[0]][game.copPlace[1]] = game.copName
+        return False,game
+    elif game.robPlace == game.copPlace:
         game.matrix[game.robPlace[0]][game.robPlace[1]] = 3
         return True,game
-    elif game.robPlace != game.copPlace:
-        game = placeOnMatrix(game,game.copPlace,game.copName)
-        return False,game
-
-def placeOnMatrix(game,place,name):
-    game.matrix[place[0]][place[1]] = name
-    return game
 
 def vertMove(game,place,name,choices):
     vert = random.choice(choices)
     place[0] += vert
-    place[0] %= game.m # prevents index errors
+    place[0] %= game.m
     print('Up/Down:',vert,'to',place[0])
     return game
 
 def horizMove(game,place,name,choices):
     horiz = random.choice(choices)
     place[1] += horiz 
-    place[1] %= game.n # prevents index errors  
+    place[1] %= game.n   
     game.matrix[place[0]][place[1]] = name
     print('Side/Side:',horiz,'to',place[1],'\n')
     return game
+
+def chaseFunc(game,robPlace,copPlace,name): # Has cop chase robber
+    # TODO
+    #vertical
+    if (robPlace[0]-copPlace[0])%game.m > -(robPlace[0]-copPlace[0])%game.m:
+        if robPlace[0]-copPlace[0] > 0:
+            pass
+        elif robPlace[0]-copPlace[0] < 0:
+            pass
+    elif (robPlace[0]-copPlace[0])%game.m < -(robPlace[0]-copPlace[0])%game.m:
+        if robPlace[0]-copPlace[0] > 0:
+            pass
+        elif robPlace[0]-copPlace[0] < 0:
+            pass
+    elif (robPlace[0]-copPlace[0])%game.m == 0: # Catches where cop and robber are on same row
+        pass
+    elif (robPlace[0]-copPlace[0])%game.m == -(robPlace[0]-copPlace[0])%game.m:
+        pass
+
+    #horizontal
+    if (robPlace[1]-copPlace[1])%game.n > -(robPlace[1]-copPlace[1])%game.n:
+        if robPlace[1]-copPlace[1] > 0:
+            pass
+        elif robPlace[1]-copPlace[1] < 0:
+            pass
+    elif (robPlace[1]-copPlace[1])%game.n < -(robPlace[1]-copPlace[1])%game.n:
+        if robPlace[1]-copPlace[1] > 0:
+            pass
+        elif robPlace[1]-copPlace[1] < 0:
+            pass
+    elif (robPlace[1]-copPlace[1])%game.n == 0:
+        pass
+    elif (robPlace[1]-copPlace[1])%game.n == -(robPlace[1]-copPlace[1])%game.n:
+        pass
 
 def sidePick(game,playerString):
     if playerString.lower() == 'rob':
