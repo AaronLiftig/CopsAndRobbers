@@ -16,6 +16,7 @@ def createMatrix(game):
 def printMatrix(game,iterCount):
     print('Iteration:',iterCount)
     print(game.matrix,'\n')
+    pass # For when print statements are commented out.
 
 def placeRob(game,place):
     # place is a location on an 0-indexed, mxn matrix
@@ -43,15 +44,14 @@ def placeCop(game,place):
         m_pc = random.randint(0,game.m-1)
         n_pc = random.randint(0,game.n-1)
         if (m_pc != game.robPlace[0]) | (n_pc != game.robPlace[1]):
-            game.matrix[m_pc][n_pc] = game.copName
-            return [m_pc,n_pc]	
+            game.matrix[m_pc][n_pc] = game.copName	
         else:
             [m_pc,n_pc] = placeCop(game,place=place)		
     elif place.__class__ == tuple:
         m_pc = place[0]
         n_pc = place[1]
         game.matrix[m_pc][n_pc] = game.copName
-        return [m_pc,n_pc]
+    return [m_pc,n_pc]
 
 def copChar(game,howDrunk,chase):
     game.copDrunk = howDrunk # Doesn't move this percent of the time
@@ -98,7 +98,7 @@ def sidePick(game,playerString):
         drunk = game.copDrunk
     return place,name,drunk
 
-def randomMove(game,playerString): #Finds possible move for player
+def randomMove(game,playerString): # Finds possible move for player
     place,name,drunk = sidePick(game,playerString)
     game.matrix[place[0]][place[1]] = 0 # Removes previous location
     
@@ -162,19 +162,34 @@ def checkIfCaught(game):
         game.matrix[game.robPlace[0]][game.robPlace[1]] = 3
         return True
 
-def playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,rob2Move=False,robPlace='random',copPlace='random'):
+def Again():
+    playAgain = input('Play again? Enter y or n.')
+    if playAgain.lower() == 'n':
+        exit() 
+    elif playAgain.lower() != 'y':
+        Again()
+
+def playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,
+                rob2Move=False,robPlace='random',copPlace='random',
+                runTest=False,iterNumber=50):
     oneMoveList = [(a,b) for a in range(-1,2) for b in range(-1,2)]
     oneMoveList.remove((0,0))
     twoMoveList = [(a,b) for a in range(-2,3) for b in range(-2,3)]
     twoMoveList.remove((0,0))
     
+    testCount = 0
+    testList = []
+    
+    x = int(input('Enter number of rows:'))
+    y = int(input('Enter number of columns:'))
+
     while True:
         game = createGame()
         game.oneMoveList = oneMoveList
         game.twoMoveList = twoMoveList
         
-        game.m = int(input('Enter number of rows:'))
-        game.n = int(input('Enter number of columns:'))
+        game.m = x
+        game.n = y
         iterCount = 0
         game.matrix = createMatrix(game)
 
@@ -198,15 +213,32 @@ def playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,rob2Move=Fals
 
         print('The cop caught the robber.')
         print('It took '+ str(iterCount) +' iterations.')
+      
+        # If runTest=True, don't comment out print statements below this point.
+        if runTest == True:
+            if testCount != iterNumber:
+                testList.append(iterCount)
+                testCount += 1
+            else:
+                print('Over',iterNumber,'iterations,')
+                print('the average iteration was', np.mean(testList))
+                print('List of iterations during test:\n',testList)
+                Again()
+                testCount = 0
+                testList = []
+        else:
+            Again()
 
-        playAgain = input('Play again? Enter y or n.')
-        if playAgain == 'n':
-            exit()
 
-
-playGame(robDrunk=.5,copDrunk=.5,robEscape=True,copChase=True,rob2Move=False,robPlace='random',copPlace='random')
+playGame(robDrunk=.5,copDrunk=.5,robEscape=True,copChase=True,
+            rob2Move=False,robPlace='random',copPlace='random',
+            runTest=False,iterNumber=50)
 
 # robDrunk and copDrunk are the probability that the respective players DON'T move
 # robEscape and copChase are whether the rob avoids and the cop follows. 'False' means random movement for that player.
 # rob2Move being 'True' means that the robber has a chance to move 1 or 2 spaces on the turns where they do move.
 # placeRob and placeCop are not 'random', input tuples representing one or both's placement on a 0-indexed, mxn matrix.
+
+# If you would like to calculate the average of a certain number of cycles, 
+# change runtest to True and adjust the iterNumber accordingly.
+# Also, comment out all print statements (except for the part after 'if runTest == True:') for a manageable output screen.
