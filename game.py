@@ -60,24 +60,20 @@ def copChar(game,howDrunk,chase):
 def startChase(game):
     go = drunkFunc(game,'rob')
     if go == True:
-        if game.robEscape == False: # Robber randomly moves
-            randomMove(game,'rob')
-        else: # Robber avoids cop
-            directFunc(game,'rob')
-        caught = checkIfCaught(game)
-        if caught == True:
-            return caught
+        directFunc(game,'rob') # Robber avoids cop
+    else:
+        randomMove(game,'rob') #  Robber randomly moves 
+    caught = checkIfCaught(game)
+    if caught == True:
+        return caught
     
     go = drunkFunc(game,'cop')
     if go == True:  
-        if game.copChase == True: # Cop chases robber
-            directFunc(game,'cop')
-        else: # Cop randomly moves
-            randomMove(game,'cop')
-        caught = checkIfCaught(game)
-        return caught
-    else:
-        return False
+        directFunc(game,'cop') # Cop chases robber        
+    else: # Cop randomly moves
+        randomMove(game,'cop')
+    caught = checkIfCaught(game)
+    return caught
 
 def drunkFunc(game,playerString):
     print('Move:',playerString)
@@ -166,16 +162,20 @@ def Again():
     playAgain = input('Play again? Enter y or n.')
     if playAgain.lower() == 'n':
         exit() 
-    elif playAgain.lower() != 'y':
+    elif playAgain.lower() == 'y':
+        return
+    else:
         Again()
 
 def playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,
                 rob2Move=False,robPlace='random',copPlace='random',
                 runTest=False,iterNumber=50):
     oneMoveList = [(a,b) for a in range(-1,2) for b in range(-1,2)]
-    oneMoveList.remove((0,0))
+    # oneMoveList.remove((0,0)) # Allows diagonal movement
+    for x in [(0,0),(-1,1),(-1,-1),(1,-1),(1,1)]:
+        oneMoveList.remove(x) # Vertical and horizontal only
     twoMoveList = [(a,b) for a in range(-2,3) for b in range(-2,3)]
-    twoMoveList.remove((0,0))
+    # twoMoveList.remove((0,0)) # Allows diagonal movement
     
     testCount = 0
     testList = []
