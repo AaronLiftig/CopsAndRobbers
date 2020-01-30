@@ -32,9 +32,8 @@ def placeRob(game,place):
         game.matrix[m_pr][n_pr] = game.robName
         return [m_pr,n_pr]
 
-def robChar(game,howDrunk,escape,rob2Move):
+def robChar(game,howDrunk,rob2Move):
     game.robDrunk = howDrunk # Doesn't move this percent of the time
-    game.robEscape = escape # If true, it tries to avoid cop
     game.rob2Move = rob2Move # Moves two squares this percent of the time
 
 def placeCop(game,place): 
@@ -53,9 +52,8 @@ def placeCop(game,place):
         game.matrix[m_pc][n_pc] = game.copName
     return [m_pc,n_pc]
 
-def copChar(game,howDrunk,chase):
+def copChar(game,howDrunk):
     game.copDrunk = howDrunk # Doesn't move this percent of the time
-    game.copChase = chase # If true, it tries to catch robber
 
 def startChase(game):
     go = drunkFunc(game,'rob')
@@ -167,9 +165,7 @@ def Again():
     else:
         Again()
 
-def playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,
-                rob2Move=False,robPlace='random',copPlace='random',
-                runTest=False,iterNumber=50):
+def playGame(robDrunk=.5,copDrunk=.5,rob2Move=False,robPlace='random',copPlace='random',runTest=False,iterNumber=50):
     oneMoveList = [(a,b) for a in range(-1,2) for b in range(-1,2)]
     # oneMoveList.remove((0,0)) # Allows diagonal movement
     for x in [(0,0),(-1,1),(-1,-1),(1,-1),(1,1)]:
@@ -194,9 +190,9 @@ def playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,
         game.matrix = createMatrix(game)
 
         game.robPlace = placeRob(game,robPlace)
-        robChar(game,robDrunk,robEscape,rob2Move)
+        robChar(game,robDrunk,rob2Move)
         game.copPlace = placeCop(game,copPlace)
-        copChar(game,copDrunk,copChase)
+        copChar(game,copDrunk)
 
         printMatrix(game,iterCount)
         print('Locations:\n','robber:',game.robPlace,'cop:',game.copPlace,'\n'*2)
@@ -230,14 +226,13 @@ def playGame(robDrunk=.5,copDrunk=.5,robEscape=False,copChase=True,
             Again()
 
 
-playGame(robDrunk=.5,copDrunk=.5,robEscape=True,copChase=True,
-            rob2Move=False,robPlace='random',copPlace='random',
-            runTest=False,iterNumber=50)
+playGame(robDrunk=.5,copDrunk=.5,rob2Move=False,robPlace='random',copPlace='random',runTest=False,iterNumber=50)
 
-# robDrunk and copDrunk are the probability that the respective players DON'T move
-# robEscape and copChase are whether the rob avoids and the cop follows. 'False' means random movement for that player.
+# robDrunk and copDrunk are the probability that the respective players move randomly.
 # rob2Move being 'True' means that the robber has a chance to move 1 or 2 spaces on the turns where they do move.
-# placeRob and placeCop are not 'random', input tuples representing one or both's placement on a 0-indexed, mxn matrix.
+
+# If you would like to place the robber and/or cop,
+# change placeRob and placeCop from 'random' to tuples representing one or both's placement on a 0-indexed, mxn matrix.
 
 # If you would like to calculate the average of a certain number of cycles, 
 # change runtest to True and adjust the iterNumber accordingly.
