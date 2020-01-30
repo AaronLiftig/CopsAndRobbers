@@ -32,9 +32,9 @@ def placeRob(game,place):
         game.matrix[m_pr][n_pr] = game.robName
         return [m_pr,n_pr]
 
-def robChar(game,howDrunk,rob2Move):
+def robChar(game,howDrunk,robMove):
     game.robDrunk = howDrunk # Doesn't move this percent of the time
-    game.rob2Move = rob2Move # Moves two squares this percent of the time
+    game.robMove = robMove # Moves two squares this percent of the time
 
 def placeCop(game,place): 
     # place is a location on a 0-indexed, mxn matrix that is not occupied by the robber
@@ -52,25 +52,31 @@ def placeCop(game,place):
         game.matrix[m_pc][n_pc] = game.copName
     return [m_pc,n_pc]
 
-def copChar(game,howDrunk):
+def copChar(game,howDrunk,copMove):
     game.copDrunk = howDrunk # Doesn't move this percent of the time
+    game.copMove = copMove
 
 def startChase(game):
-    go = drunkFunc(game,'rob')
-    if go == True:
-        directFunc(game,'rob') # Robber avoids cop
-    else:
-        randomMove(game,'rob') #  Robber randomly moves 
-    caught = checkIfCaught(game)
-    if caught == True:
-        return caught
-    
-    go = drunkFunc(game,'cop')
-    if go == True:  
-        directFunc(game,'cop') # Cop chases robber        
-    else: # Cop randomly moves
-        randomMove(game,'cop')
-    caught = checkIfCaught(game)
+    # TODO for robber on board (when multiple robbers spawn in)
+    for turn in range(game.robMove):    
+        go = drunkFunc(game,'rob')
+        if go == True:
+            directFunc(game,'rob') # Robber avoids cop
+        else:
+            randomMove(game,'rob') #  Robber randomly moves 
+        caught = checkIfCaught(game)
+        if caught == True:
+            return caught
+    # TODO for cop on board (when multiple cops spawn in)
+    for turn in range(game.copMove):
+        go = drunkFunc(game,'cop')
+        if go == True:  
+            directFunc(game,'cop') # Cop chases robber        
+        else: 
+            randomMove(game,'cop') # Cop randomly moves
+        caught = checkIfCaught(game)
+        if caught == True:
+            return caught  
     return caught
 
 def drunkFunc(game,playerString):
@@ -97,30 +103,23 @@ def randomMove(game,playerString): # Finds possible move for player
     game.matrix[place[0]][place[1]] = 0 # Removes previous location
     
     if playerString == 'rob':
-        if game.rob2Move == False:
-            move(game,game.robPlace,game.robName,game.oneMoveList)
-        elif game.rob2Move == True:
-            move(game,game.robPlace,game.robName,game.twoMoveList)
+        move(game,game.robPlace,game.robName,game.oneMoveList)   
     elif playerString == 'cop':
         move(game,game.copPlace,game.copName,game.oneMoveList)
 
 def move(game,place,name,choices):
     moveTup = random.choice(choices)
-    
     place[0] = (place[0] + moveTup[0]) % game.m
-    print('Up/Down:',moveTup[0],'to',place[0]) 
-    
-    place[1] = (place[1] + moveTup[1]) % game.n  
+    place[1] = (place[1] + moveTup[1]) % game.n 
+    print('Up/Down:',moveTup[0],'to',place[0])  
     print('Side/Side:',moveTup[1],'to',place[1],'\n')
-    
     game.matrix[place[0]][place[1]] = name 
 
 def directFunc(game,playerString): # Cop chase robber and/or robber avoids cop.
     place,name,drunk = sidePick(game,playerString)
     robPlace = game.robPlace
     copPlace = game.copPlace
-    
-    game.matrix[place[0]][place[1]] = 0 # Removes players' previous location
+    game.matrix[place[0]][place[1]] = 0 # Removes robber/cop's previous location
     #vertical
     if (robPlace[0]-copPlace[0])%game.m > (copPlace[0]-robPlace[0])%game.m:
         place[0] = (place[0]-1)%game.m # Player moves up
@@ -165,13 +164,10 @@ def Again():
     else:
         Again()
 
-def playGame(robDrunk=.5,copDrunk=.5,rob2Move=False,robPlace='random',copPlace='random',runTest=False,iterNumber=50):
-    oneMoveList = [(a,b) for a in range(-1,2) for b in range(-1,2)]
-    # oneMoveList.remove((0,0)) # Allows diagonal movement
-    for x in [(0,0),(-1,1),(-1,-1),(1,-1),(1,1)]:
-        oneMoveList.remove(x) # Vertical and horizontal only
-    twoMoveList = [(a,b) for a in range(-2,3) for b in range(-2,3)]
-    # twoMoveList.remove((0,0)) # Allows diagonal movement
+def playGame(robDrunk=.5,copDrunk=.5,robMove=1,copMove=1,robPlace='random',copPlace='random',runTest=False,iterNumber=50):
+    oneMoveList = [(a,b) for a in range(-1,2) for b in range(-1,2)] # By default, can move diagonally and stand still
+    # for x in [(0,0),(-1,1),(-1,-1),(1,-1),(1,1)]:
+    #     oneMoveList.remove(x) # Vertical and horizontal only
     
     testCount = 0
     testList = []
@@ -182,7 +178,6 @@ def playGame(robDrunk=.5,copDrunk=.5,rob2Move=False,robPlace='random',copPlace='
     while True:
         game = createGame()
         game.oneMoveList = oneMoveList
-        game.twoMoveList = twoMoveList
         
         game.m = x
         game.n = y
@@ -190,9 +185,9 @@ def playGame(robDrunk=.5,copDrunk=.5,rob2Move=False,robPlace='random',copPlace='
         game.matrix = createMatrix(game)
 
         game.robPlace = placeRob(game,robPlace)
-        robChar(game,robDrunk,rob2Move)
+        robChar(game,robDrunk,robMove)
         game.copPlace = placeCop(game,copPlace)
-        copChar(game,copDrunk)
+        copChar(game,copDrunk,copMove)
 
         printMatrix(game,iterCount)
         print('Locations:\n','robber:',game.robPlace,'cop:',game.copPlace,'\n'*2)
@@ -225,14 +220,14 @@ def playGame(robDrunk=.5,copDrunk=.5,rob2Move=False,robPlace='random',copPlace='
         else:
             Again()
 
+playGame(robDrunk=.5,copDrunk=.5,robMove=2,copMove=1,robPlace='random',copPlace='random',runTest=False,iterNumber=50)
 
-playGame(robDrunk=.5,copDrunk=.5,rob2Move=False,robPlace='random',copPlace='random',runTest=False,iterNumber=50)
+# robDrunk and copDrunk are the probability that the respective players move randomly
 
-# robDrunk and copDrunk are the probability that the respective players move randomly.
-# rob2Move being 'True' means that the robber has a chance to move 1 or 2 spaces on the turns where they do move.
+# robMove and copMove represent the number of moves the robber and cop are given each turn
 
-# If you would like to place the robber and/or cop,
-# change placeRob and placeCop from 'random' to tuples representing one or both's placement on a 0-indexed, mxn matrix.
+# To manually place robber and cop, change robPlace and/or copPlace from 'random',
+# to tuples representing one or both's placement on a 0-indexed, mxn matrix.
 
 # If you would like to calculate the average of a certain number of cycles, 
 # change runtest to True and adjust the iterNumber accordingly.
