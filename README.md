@@ -12,4 +12,4 @@
 
 ### Multiple cycles of this game can be played in a row by changing the runTest option to True (and commenting out most of the print statements).
 
-### Additional features will include spawning in new robbers and cops after certain conditions are met, ways for robbers to eliminate cops from the matrix, etc.
+### Additional features will include spawning in new robbers and cops after certain conditions are met, ways for robbers to eliminate cops from the matrix, randomly placed obstacles on the matrix, etc.
