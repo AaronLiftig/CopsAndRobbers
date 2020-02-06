@@ -5,7 +5,7 @@
 
 ### The goal is to see the probability of the cop capturing the robber under various conditions, including:
 #### Various sizes of a matrix, which the cop and robber traverse. The cop and robber can currently loop through the walls of the matrix, kind of like the game PacMan but all over the walls of the matrix. That is, the matrix acts like a torus.
-#### A probability representing how 'drunk' the robber and cop are, meaning how often they purposely or randomly move.
+#### A probability representing how 'drunk' the robber and cop are, meaning how often they purposefully or randomly move.
 #### How many consecutive moves the robber and cop make per turn.
 
 ### Currently moves occur in a turn-based fashion, with the robber moving first. This avoids situations where the cop and robber cross paths but don't acknowledge each other. This turn-based nature may be modified in the future.
