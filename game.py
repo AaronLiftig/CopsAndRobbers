@@ -56,36 +56,37 @@ def copChar(game,howDrunk,copMove):
     game.copDrunk = howDrunk # Doesn't move this percent of the time
     game.copMove = copMove
 
-def startChase(game):
+def startChase(game,runTest):
     # TODO for robber on board (when multiple robbers spawn in)
     for turn in range(game.robMove):    
-        go = drunkFunc(game,'rob')
-        if go == True:
+        purposeful = drunkFunc(game,'rob',runTest)
+        if purposeful == True:
             directFunc(game,'rob') # Robber avoids cop
         else:
-            randomMove(game,'rob') #  Robber randomly moves 
+            randomMove(game,'rob',runTest) # Robber randomly moves 
         caught = checkIfCaught(game)
         if caught == True:
             return caught
     # TODO for cop on board (when multiple cops spawn in)
     for turn in range(game.copMove):
-        go = drunkFunc(game,'cop')
-        if go == True:  
+        purposeful = drunkFunc(game,'cop',runTest)
+        if purposeful == True:  
             directFunc(game,'cop') # Cop chases robber        
         else: 
-            randomMove(game,'cop') # Cop randomly moves
+            randomMove(game,'cop',runTest) # Cop randomly moves
         caught = checkIfCaught(game)
         if caught == True:
             return caught  
     return caught
 
-def drunkFunc(game,playerString):
-    print('Move:',playerString)
+def drunkFunc(game,playerString,runTest):
     place,name,drunk = sidePick(game,playerString)
-    go = random.choices([False,True],[drunk,1-drunk])
-    print('Go:',go[0])
-    print('place:',place,'\n')
-    return go[0]
+    purposeful = random.choices([False,True],[drunk,1-drunk])
+    if runTest==False:
+        print('Move:',playerString)
+        print('purposeful:',purposeful[0])
+        print('place:',place,'\n')
+    return purposeful[0]
 
 def sidePick(game,playerString):
     if playerString.lower() == 'rob':
@@ -98,21 +99,22 @@ def sidePick(game,playerString):
         drunk = game.copDrunk
     return place,name,drunk
 
-def randomMove(game,playerString): # Finds possible move for player
+def randomMove(game,playerString,runTest): # Finds possible move for player
     place,name,drunk = sidePick(game,playerString)
     game.matrix[place[0]][place[1]] = 0 # Removes previous location
     
     if playerString == 'rob':
-        move(game,game.robPlace,game.robName,game.oneMoveList)   
+        move(game,game.robPlace,game.robName,game.oneMoveList,runTest)   
     elif playerString == 'cop':
-        move(game,game.copPlace,game.copName,game.oneMoveList)
+        move(game,game.copPlace,game.copName,game.oneMoveList,runTest)
 
-def move(game,place,name,choices):
+def move(game,place,name,choices,runTest):
     moveTup = random.choice(choices)
     place[0] = (place[0] + moveTup[0]) % game.m
     place[1] = (place[1] + moveTup[1]) % game.n 
-    print('Up/Down:',moveTup[0],'to',place[0])  
-    print('Side/Side:',moveTup[1],'to',place[1],'\n')
+    if runTest==False:
+        print('Up/Down:',moveTup[0],'to',place[0])  
+        print('Side/Side:',moveTup[1],'to',place[1],'\n')
     game.matrix[place[0]][place[1]] = name 
 
 def directFunc(game,playerString): # Cop chase robber and/or robber avoids cop.
@@ -189,21 +191,24 @@ def playGame(robDrunk=.5,copDrunk=.5,robMove=1,copMove=1,robPlace='random',copPl
         game.copPlace = placeCop(game,copPlace)
         copChar(game,copDrunk,copMove)
 
-        printMatrix(game,iterCount)
-        print('Locations:\n','robber:',game.robPlace,'cop:',game.copPlace,'\n'*2)
+        if runTest==False:
+            printMatrix(game,iterCount)
+            print('Locations:\n','robber:',game.robPlace,'cop:',game.copPlace,'\n'*2)
 
         while True:
-            caught = startChase(game)
+            caught = startChase(game,runTest)
             iterCount += 1
 
-            printMatrix(game,iterCount)
-            print('Locations:\n','robber:',game.robPlace,'cop:',game.copPlace,'\n'*3)
+            if runTest==False:
+                printMatrix(game,iterCount)
+                print('Locations:\n','robber:',game.robPlace,'cop:',game.copPlace,'\n'*3)
             
             if caught == True:
                 break
 
-        print('The cop caught the robber.')
-        print('It took '+ str(iterCount) +' iterations.')
+        if runTest==False:
+            print('The cop caught the robber.')
+            print('It took '+ str(iterCount) +' iterations.')
       
         # If runTest=True, don't comment out print statements below this point.
         if runTest == True:
@@ -220,7 +225,7 @@ def playGame(robDrunk=.5,copDrunk=.5,robMove=1,copMove=1,robPlace='random',copPl
         else:
             Again()
 
-playGame(robDrunk=.5,copDrunk=.5,robMove=2,copMove=1,robPlace='random',copPlace='random',runTest=False,iterNumber=50)
+playGame(robDrunk=.5,copDrunk=0,robMove=2,copMove=1,robPlace='random',copPlace='random',runTest=True,iterNumber=50)
 
 # robDrunk and copDrunk are the probability that the respective players move randomly
 
@@ -231,4 +236,4 @@ playGame(robDrunk=.5,copDrunk=.5,robMove=2,copMove=1,robPlace='random',copPlace=
 
 # If you would like to calculate the average of a certain number of cycles, 
 # change runtest to True and adjust the iterNumber accordingly.
-# Also, comment out all print statements (except for the part after 'if runTest == True:') for a manageable output screen.
+# Print statments have been made conditional on the runTest variable in order to have a manageable output screen.
