@@ -16,7 +16,6 @@ def createMatrix(game):
 def printMatrix(game,iterCount):
     print('Iteration:',iterCount)
     print(game.matrix,'\n')
-    pass # For when print statements are commented out.
 
 def placeRob(game,place):
     # place is a location on an 0-indexed, mxn matrix
@@ -33,8 +32,8 @@ def placeRob(game,place):
         return [m_pr,n_pr]
 
 def robChar(game,howDrunk,robMove):
-    game.robDrunk = howDrunk # Doesn't move this percent of the time
-    game.robMove = robMove # Moves two squares this percent of the time
+    game.robDrunk = howDrunk
+    game.robMove = robMove
 
 def placeCop(game,place): 
     # place is a location on a 0-indexed, mxn matrix that is not occupied by the robber
@@ -45,7 +44,10 @@ def placeCop(game,place):
         if (m_pc != game.robPlace[0]) | (n_pc != game.robPlace[1]):
             game.matrix[m_pc][n_pc] = game.copName	
         else:
-            [m_pc,n_pc] = placeCop(game,place=place)		
+            [m_pc,n_pc] = placeCop(game,place=place) 
+            # To scale this (for both the cop and robber),
+            # it would be better to use a list of occupied indices
+            # and randomly pick among the open ones
     elif place.__class__ == tuple:
         m_pc = place[0]
         n_pc = place[1]
@@ -53,7 +55,7 @@ def placeCop(game,place):
     return [m_pc,n_pc]
 
 def copChar(game,howDrunk,copMove):
-    game.copDrunk = howDrunk # Doesn't move this percent of the time
+    game.copDrunk = howDrunk
     game.copMove = copMove
 
 def startChase(game,runTest):
