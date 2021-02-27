@@ -33,6 +33,7 @@ class DrunkenCopsAndRobbers:
         self.get_matrix_dimensions()
 
         while True:
+            print('Game Number:',run_count,'\n')
             self.iteration_count = 0
             self.matrix = self.create_matrix()
 
@@ -89,7 +90,9 @@ class DrunkenCopsAndRobbers:
                 if run_count < num_of_games:
                     results_list.append(self.iteration_count)
                     run_count += 1
-                    if len(self.rob_loc_list) < grid_size:
+                    if self.iteration_count == max_iter_per_game:
+                        win_list.append(0)
+                    elif len(self.rob_loc_list) < grid_size:
                         win_list.append(2)
                     else:
                         win_list.append(1)
@@ -385,5 +388,5 @@ class DrunkenCopsAndRobbers:
 DrunkenCopsAndRobbers(rob_drunk_pct=.5,cop_drunk_pct=.5,rob_move_len=1,
                 cop_move_len=1,diagonal_move=True,pass_move=True,
                 ply_before_robber_spawn=-1,rob_loc='random',
-                cop_loc='random',multi_game=False,num_of_games=50,
-                max_iter_per_game=100)
+                cop_loc='random',multi_game=True,num_of_games=50,
+                max_iter_per_game=1000)
