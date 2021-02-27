@@ -358,13 +358,15 @@ class DrunkenCopsAndRobbers:
         elif player_string == 'rob' and self.rob_loc == self.cop_loc:
             self.matrix[tuple(self.rob_loc)] = 3
             self.rob_loc_list.remove(self.rob_loc) 
-            print('CAUGHT! The robber landed on the cop')
+            if not self.multi_game:
+                print('CAUGHT! The robber landed on the cop')
             return True
         elif (player_string == 'cop' and self.cop_loc in   
             self.rob_loc_list):
             self.matrix[tuple(self.cop_loc)] = 3
             self.rob_loc_list.remove(self.cop_loc) 
-            print('CAUGHT! The cop landed on a robber')
+            if not self.multi_game:
+                print('CAUGHT! The cop landed on a robber')
             return True
 
     def again(self):
