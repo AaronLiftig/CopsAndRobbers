@@ -13,3 +13,20 @@ Currently, moves occur in a turn-based fashion, with the robber moving first. Th
 Multiple cycles of this game can be played in a row by changing the runTest option to True. The print statements have been made conditional on the runTest variable in order to have a manageable output.
 
 Additional features will include spawning in new robbers and cops after certain conditions are met, ways for robbers to eliminate cops from the matrix, randomly placed obstacles on the matrix, etc.
+
+
+## Parameters:
+
+- **rob_drunk_pct** and **cop_drunk_pct** are the probability that the respective players move randomly
+
+- **rob_move_len** and **cop_move_len** represent the number of moves the robber and cop are given each turn
+
+- To manually place robber and cop, change **rob_loc** and/or **cop_loc** from 'random' a tuple representing one or both's placement on a 0-indexed, mxn matrix.
+
+- **diagonal_move** allows for diagonal drunk movements
+
+- **pass_move** allows for drunk characters to not move for their turn
+
+- If you would like to calculate the average of a certain number of games, change **multi_game** to True and adjust the **num_of_games** accordingly. Print statments have been made conditional on the **multi_game** variable in order to have a manageable output screen.
+
+- **max_iter_per_game** creates a max number of iterations per game
