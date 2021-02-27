@@ -106,6 +106,7 @@ class DrunkenCopsAndRobbers:
                     self.again()
                     run_count = 0
                     results_list = []
+                    win_list = []
             else:
                 self.again()
 
