@@ -381,6 +381,6 @@ class DrunkenCopsAndRobbers:
 
 DrunkenCopsAndRobbers(rob_drunk_pct=.5,cop_drunk_pct=.5,rob_move_len=1,
                 cop_move_len=1,diagonal_move=True,pass_move=True,
-                ply_before_robber_spawn=2,rob_loc='random',
+                ply_before_robber_spawn=-1,rob_loc='random',
                 cop_loc='random',multi_game=False,num_of_games=50,
                 max_iter_per_game=100)
