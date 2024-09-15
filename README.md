@@ -1,34 +1,31 @@
-# CopsAndRobbers
-## Combinatorics research game (for attempting to simulate biological systems)
+# Cops and Robbers
 
-A game of 'drunken' cops and robbers, where the cop and robber move similar to chess kings or rooks on an 0-indexed, mxn matrix that behaves like a torus. 
+A research game designed to simulate biological systems. This game models a scenario where a "cop" and a "robber" move on a toroidal matrix, similar to chess kings or rooks, with the goal of determining the probability of capture under various conditions.
 
-### Simulation can be played here: https://repl.it/@AaronLiftig/Cops-and-Robbers
+## Features
 
-The goal is to find the probability of the cop capturing the robber under various conditions, including:
-- Various sizes of a matrix, which the cop and robber traverse. The cop and robber can currently loop through the walls of the matrix, kind of like the game PacMan but all over the walls of the matrix. That is, the matrix acts like a torus.
-- A probability representing how 'drunk' the robber and cop are, meaning how often they purposefully or randomly move.
-- How many consecutive moves the robber and cop make per turn.
+- **Toroidal Matrix**: The matrix wraps around like a torus, allowing movement through the walls.
+- **Probabilistic Movement**: The cop and robber can move randomly with defined probabilities.
+- **Turn-Based Simulation**: The game proceeds in a turn-based manner, with the robber moving first.
+- **Customizable Parameters**: Adjust movement length, randomness, and other parameters to explore different scenarios.
+- **Extended Functionality**: Future features include obstacles, additional agents, and more.
 
-Currently, moves occur in a turn-based fashion, with the robber moving first. This avoids situations where the cop and robber cross paths but don't acknowledge each other. This turn-based nature may be modified in the future.
+## Parameters
 
-Multiple cycles of this game can be played in a row by changing the runTest option to True. The print statements have been made conditional on the runTest variable in order to have a manageable output.
+- `rob_drunk_pct` and `cop_drunk_pct`: Probability that the respective players move randomly.
+- `rob_move_len` and `cop_move_len`: Number of moves allowed for the robber and cop per turn.
+- `rob_loc` and `cop_loc`: Starting locations of the robber and cop.
+- `diagonal_move`: Allows for diagonal movements.
+- `pass_move`: Allows characters to skip their move.
+- `multi_game`: Enables running multiple game simulations to calculate average results.
+- `max_iter_per_game`: Maximum number of iterations per game.
 
-Additional features will include spawning in new robbers and cops after certain conditions are met, ways for robbers to eliminate cops from the matrix, randomly placed obstacles on the matrix, etc.
+## Usage
 
+1. Clone the repository: `git clone https://github.com/YourUsername/CopsAndRobbers.git`
+2. Navigate to the project directory.
+3. Run the script: `python game.py`
 
-## Parameters:
+## Play the Simulation
 
-- **rob_drunk_pct** and **cop_drunk_pct** are the probability that the respective players move randomly
-
-- **rob_move_len** and **cop_move_len** represent the number of moves the robber and cop are given each turn
-
-- To manually place robber and cop, change **rob_loc** and/or **cop_loc** from 'random' a tuple representing one or both's placement on a 0-indexed, mxn matrix.
-
-- **diagonal_move** allows for diagonal drunk movements
-
-- **pass_move** allows for drunk characters to not move for their turn
-
-- If you would like to calculate the average of a certain number of games, change **multi_game** to True and adjust the **num_of_games** accordingly. Print statments have been made conditional on the **multi_game** variable in order to have a manageable output screen.
-
-- **max_iter_per_game** creates a max number of iterations per game
+You can play the simulation online at: [Simulation Link](https://repl.it/@AaronLiftig/Cops-and-Robbers)
